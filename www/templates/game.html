@@ -1,0 +1,14 @@
+<ion-view view-title="Game">
+	<ion-content class="game-content" scroll="false">
+		<div id="message">{{message}}
+			<a ng-click="playerMovedDebug()" ng-if="false">moved</a>
+		</div>
+		<div id="map"></div>
+		<div id="shapes">
+			<p>Collect in order (left to right):</p>
+			<div ng-repeat="shape in demand_sequence">
+				<img ng-src="img/{{shape.type}}.png"/>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>

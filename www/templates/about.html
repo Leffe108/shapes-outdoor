@@ -1,0 +1,54 @@
+<ion-view view-title="About">
+	<ion-content class="about-content">
+
+		<div class="list">
+			<div class="item item-text-wrap">
+				Objective: Collect shapes in the world around you.<br>
+			</div>
+			<div class="item item-text-wrap">
+				Controls: The game is controlled using geolocation. So you have to get out and walk. All shapes are within a radius of 600 meters from your start location.
+			</div>
+
+			<div class="item item-divider item-text-wrap">
+				Author
+			</div>
+			<div class="item item-text-wrap">
+				Name: Leif Linse
+			</div>
+			<div class="item item-text-wrap">
+				Github: leffe108
+			</div>
+			<div class="item item-divider item-text-wrap">
+				Used libraries
+			</div>
+			<div class="item item-text-wrap">
+				Ionic
+			</div>
+			<div class="item item-text-wrap">
+				Leafletjs
+			</div>
+			<div class="item item-text-wrap">
+				rotatedMarker from Leaflet.PolylineDecorator
+			</div>
+			<div class="item item-text-wrap">
+				Turfjs
+			</div>
+
+			<div ng-if="device">
+				<div class="item item-divider item-text-wrap">
+					Cordova plugins
+				</div>
+				<div class="item item-text-wrap">
+					cordova TTS
+				</div>
+				<div class="item item-text-wrap">
+					cordova geolocation
+				</div>
+			</div>
+			
+			<div class="item" ng-show="debug != ''">{{debug}}</div>
+		</div>
+
+		
+	</ion-content>
+</ion-view>
