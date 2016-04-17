@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform, $timeout, GameService) {
+.run(function($ionicPlatform, $timeout, GameService, MusicService) {
 	$ionicPlatform.ready(function() {
 		// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
 		// for form inputs)
@@ -19,8 +19,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 			// org.apache.cordova.statusbar required
 			StatusBar.styleDefault();
 		}
-
-		GameService.continueOrNewGame();
 
 		// MIT-licensed code by Benjamin Becquet
 		// https://github.com/bbecquet/Leaflet.PolylineDecorator
@@ -46,6 +44,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 		};
 		// End of code by Benjamin Becquet
 
+		GameService.continueOrNewGame();
 	});
 })
 

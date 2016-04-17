@@ -274,7 +274,7 @@ angular.module('starter.services', [])
 	return self;
 })
 
-.factory('SpeakService', function($q, LogService) {
+.factory('SpeakService', function($q, LogService, MusicService) {
 
 	var self = {
 		has_init: false,
@@ -335,6 +335,9 @@ angular.module('starter.services', [])
 
 			if (!self.canSpeakNow(minSilenceTimeS)) return;
 
+			LogService.writeLn('SpeakService: say');
+			MusicService.mute(true);
+
 			if (self.has_tts) {
 				self.is_speaking = true;
 				TTS.speak({
@@ -345,12 +348,14 @@ angular.module('starter.services', [])
 					// done
 					self.last_end = (new Date()).getTime();
 					self.is_speaking = false;
+					MusicService.mute(false);
 				}, function(reason) {
 					// failed
 					
 					// fall back to Web API if available
 					self.has_tts = false;
 					self.is_speaking = false;
+					MusicService.mute(false);
 					self.say(text);
 				});
 			} else if(self.has_web_api) {
@@ -362,15 +367,20 @@ angular.module('starter.services', [])
 				utterThis.pitch = 1.2;
 				utterThis.rate = 0.3;
 				utterThis.onend = function() {
+					LogService.writeLn('speak .onend');
 					self.last_end = (new Date()).getTime();
 					self.is_speaking = false;
+					MusicService.mute(false);
 				};
 				utterThis.onerror = function() {
+					LogService.writeLn('speak .onerror');
 					self.is_speaking = false;
+					MusicService.mute(false);
 				};
 				window.speechSynthesis.speak(utterThis);
 			} else {
 				LogService.writeLn('SpeakService: There is no Text-to-speach API available');
+				MusicService.mute(false);
 			}
 		},
 
@@ -416,6 +426,33 @@ angular.module('starter.services', [])
 			window.localStorage.setItem('mute', value);
 		},
 	};
+	return self;
+})
+
+.factory('MusicService', function($q, LogService) {
+	var self = {
+		music: null,
+		music_muted: false,
+
+		init: function() {
+			self.music = document.getElementById('music');
+			self.music.volume = 0.6;
+			self.music.play();
+		},
+		mute: function(value) {
+			if (value) {
+				LogService.writeLn('MusicService: mute');
+				// Play/pause too quick cause an exception to be thrown. Minimal volume does seem to work
+				// more stable.
+				self.music.volume = 0.01;
+			} else {
+				LogService.writeLn('MusicService: unmute');
+				self.music.volume = 0.6;
+				self.music.play();
+			}
+		},
+	};
+	self.init();
 	return self;
 })
 
