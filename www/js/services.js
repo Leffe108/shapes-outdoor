@@ -76,7 +76,7 @@ angular.module('starter.services', [])
 			}
 		},
 
-		newGame: function() {
+		newGame: function(difficulty) {
 			var dfd = $q.defer();
 
 			// Reset game state
@@ -95,7 +95,7 @@ angular.module('starter.services', [])
 				navigator.geolocation.getCurrentPosition(function(position) {
 					self._initial_position = positionToObj(position);
 					self._player_position = positionToObj(position);
-					self.generateWorld();
+					self.generateWorld(difficulty);
 					self.save();
 					self._no_game = false;
 
@@ -118,38 +118,74 @@ angular.module('starter.services', [])
 			return dfd.promise;
 		},
 
-		generateWorld: function() {
-			LogService.writeLn('Generate world');
-			var shapes = ['square', 'circle', 'cross', 'triangle', 'ring'];
-
-			self._demand_sequence = [];
-			for (var i = 0; i < 7; i++) {
-				self._demand_sequence.push({
-					i: i,
-					type: shapes[Math.floor(Math.random() * shapes.length)],
-				});
-			}
-
+		generateWorld: function(difficulty) {
+			LogService.writeLn('Generate world. Difficulty: ' + difficulty);
 			var initial_pos = turf.point([self._initial_position.coords.longitude, self._initial_position.coords.latitude]);
 
-			for (var i = 0; i < 25; i++) {
-				// Balance type availability to what is demanded
-				var shape_type = self._demand_sequence[i % self._demand_sequence.length].type;
+			self._demand_sequence = [];
+			var shapes = [];
+			if (difficulty === 'original') {
+				shapes = ['square', 'circle', 'cross', 'triangle', 'ring'];
 
-				var distance_km = 0.1 + Math.random() * 0.5;
-				var angle = -180 + Math.random() * 360;
-				var pos = turf.destination(initial_pos, distance_km, angle, 'kilometers');
-				var latitude = pos.geometry.coordinates[1];
-				var longitude = pos.geometry.coordinates[0];
-				//LogService.writeLn(shape_type + ' at ' + latitude + ',' + longitude);
+				for (var i = 0; i < 7; i++) {
+					self._demand_sequence.push({
+						i: i,
+						type: shapes[Math.floor(Math.random() * shapes.length)],
+					});
+				}
 
-				self._world_shapes.push({
-					type: shape_type,
-					coords: {
-						latitude: latitude,
-						longitude: longitude,
-					},
-				});
+				for (var i = 0; i < 25; i++) {
+					// Balance type availability to what is demanded
+					var shape_type = self._demand_sequence[i % self._demand_sequence.length].type;
+
+					var distance_km = 0.1 + Math.random() * 0.5;
+					var angle = -180 + Math.random() * 360;
+					var pos = turf.destination(initial_pos, distance_km, angle, 'kilometers');
+					var latitude = pos.geometry.coordinates[1];
+					var longitude = pos.geometry.coordinates[0];
+					//LogService.writeLn(shape_type + ' at ' + latitude + ',' + longitude);
+
+					self._world_shapes.push({
+						type: shape_type,
+						coords: {
+							latitude: latitude,
+							longitude: longitude,
+						},
+					});
+				}
+			} else if (difficulty === 'easy') {
+				shapes = ['square', 'circle', 'triangle'];
+
+				// Demand sequence
+				for (var i = 0; i < 3; i++) {
+					self._demand_sequence.push({
+						i: i,
+						type: shapes[i],
+					});
+				}
+
+				// Add shapes to collect
+				for (var i_range = 0; i_range < 4; i_range++) {
+					for (var i_angle = 0; i_angle < 6; i_angle++) {
+						var shape_type = self._demand_sequence[i_angle % self._demand_sequence.length].type;
+
+						var distance_km = 0.1 * (i_range + 1);
+						var angle = -180 + (i_angle + i_range) % 6 / 6.0 * 360;
+						var pos = turf.destination(initial_pos, distance_km, angle, 'kilometers');
+						var latitude = pos.geometry.coordinates[1];
+						var longitude = pos.geometry.coordinates[0];
+
+						self._world_shapes.push({
+							type: shape_type,
+							coords: {
+								latitude: latitude,
+								longitude: longitude,
+							},
+						});
+					}
+				}
+			} else {
+				throw "Unexpected difficulty";
 			}
 
 		},

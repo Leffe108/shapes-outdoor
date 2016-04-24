@@ -1,21 +1,56 @@
 angular.module('starter.controllers', [])
 
-.controller('StartCtrl', function($scope, $state) {
-	$scope.start = function() {
-		$state.go('app.game');
-	};
-})
-
-.controller('AppCtrl', function($scope, $state, GameService, SpeakService) {
-
-	$scope.mute = SpeakService.getMute();
-
-	$scope.newGame = function() {
-		GameService.newGame().then(function() {
+/**
+ * Shows prompt to select original difficulty or easy game.
+ */
+.factory('NewGamePrompt', function($state, $ionicPopup, GameService) {
+	var newGame = function(difficulty) {
+		GameService.newGame(difficulty).then(function() {
 			$state.go('app.game');
 		}, function() {
 			alert('New game failed');
 		});
+	};
+	var self = {
+		show: function() {
+			$ionicPopup.show({
+				title: 'Difficulty',
+				subTitle: '<b>Original (LD35):</b> collect 8 shapes available at random distance 100-600m from start location.<br><br>' +
+					'<b>Easy:</b> collect 3 shapes all available at 100m distance from start location',
+				buttons: [
+					{
+						text: 'Original (LD35)',
+						type: 'button-positive',
+						onTap: function(e) {
+							newGame('original');
+						},
+					},
+					{
+						text: 'Easy',
+						type: 'button-default',
+						onTap: function(e) {
+							newGame('easy');
+						},
+					},
+				],
+			});
+		}
+	};
+	return self;
+})
+
+.controller('StartCtrl', function($scope, NewGamePrompt) {
+	$scope.start = function() {
+		NewGamePrompt.show();
+	};
+})
+
+.controller('AppCtrl', function($scope, $state, GameService, SpeakService, NewGamePrompt) {
+
+	$scope.mute = SpeakService.getMute();
+
+	$scope.newGame = function() {
+		NewGamePrompt.show();
 	};
 
 	$scope.restartWatchPosition = function() {
