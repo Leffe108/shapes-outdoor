@@ -44,7 +44,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 		};
 		// End of code by Benjamin Becquet
 
-		GameService.continueOrNewGame();
+		GameService.loadGame();
 	});
 })
 

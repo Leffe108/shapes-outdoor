@@ -38,6 +38,7 @@ angular.module('starter.services', [])
 
 		_callbacks: null,
 		_event_queue: [],
+		_loaded: false,
 
 		// player moved status
 		S_MOVED: 'moved',
@@ -57,23 +58,22 @@ angular.module('starter.services', [])
 			saveObj('world_shapes', self._world_shapes);
 		},
 
-		continueOrNewGame: function() {
+		loadGame: function() {
 			LogService.writeLn('GameService: continue or new game');
 			self._demand_sequence = [];
 			self._world_shapes = [];
 
 			if (self.load()) {
 				self._no_game = false;
+				self._loaded = true;
 
 				self.pushEvent('game_loaded');
 				self.callEvents();
-
-				var dfd = $q.defer();
-				dfd.resolve();
-				return dfd.promise;
-			} else {
-				return self.newGame();
 			}
+		},
+
+		hasLoaded: function() {
+			return self._loaded;
 		},
 
 		newGame: function(difficulty) {

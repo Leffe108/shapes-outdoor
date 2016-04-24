@@ -39,9 +39,13 @@ angular.module('starter.controllers', [])
 	return self;
 })
 
-.controller('StartCtrl', function($scope, NewGamePrompt) {
+.controller('StartCtrl', function($scope, $state, GameService, NewGamePrompt) {
 	$scope.start = function() {
-		NewGamePrompt.show();
+		if (GameService.hasLoaded()) {
+			$state.go('app.game');
+		} else {
+			NewGamePrompt.show();
+		}
 	};
 })
 
